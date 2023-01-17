@@ -170,8 +170,79 @@ Es gibt sechs Register, die die Argumente des verwendeten Systemaufrufs speicher
 
 
 
+## Register Addressing
+Im Register Addressing wird die Daten aus einem Register gelesen oder geschrieben. 
+- Immediate Addressing bedeutet, dass die Daten direkt in den Befehl eingefügt werden und nicht aus einem Register oder Speicher gelesen werden müssen. 
+- Memory Addressing bedeutet, dass die Daten aus dem Speicher gelesen oder geschrieben werden.
+
+In der Assembly Sprache benötigen die meisten Anweisungen Operanden, um verarbeitet zu werden. Eine Operandenadresse gibt den Speicherort an, an dem die zu verarbeitenden Daten gespeichert sind. Einige Anweisungen benötigen keinen Operanden, während andere Anweisungen einen, zwei oder sogar drei Operanden benötigen können.
+
+Wenn eine Anweisung zwei Operanden benötigt, ist der erste Operand in der Regel das Ziel, das Daten in einem Register oder einer Speicherstelle enthält und der zweite Operand ist die Quelle. Die Quelle enthält entweder die zu übertragenden Daten (direkte Adressierung) oder die Adresse (im Register oder Speicher) der Daten. In der Regel bleiben die Quelldaten nach dem Vorgang unverändert.
+
+Die drei grundlegenden Adressierungsarten sind:
+- Register-Adressierung (Register addressing)
+- unmittelbare Adressierung  (Immediate addressing)
+- Speicheradressierung. (Memory addressing)
+
+## Register-Adressierung
+Im Register-Adressierungsmodus enthält ein Register den Operanden. Je nach Anweisung kann das Register das erste Operand, das zweite Operand oder beides sein. 
+Beispielsweise:
+```
+MOV DX, TAX_RATE ; (Register im ersten Operanden) 
+MOV COUNT, CX ; (Register im zweiten Operanden) 
+MOV EAX, EBX ; (Beide Operanden sind in Registern).
+```
+Da die Verarbeitung von Daten zwischen Registern keinen Zugriff auf den Speicher erfordert, bietet es die schnellste Verarbeitung von Daten.
+
+## unmittelbaren Adressierung (Immediate Addressing)
+Bei der unmittelbaren Adressierung hat ein Operand einen konstanten Wert oder einen Ausdruck. Wenn ein Befehl mit zwei Operanden die unmittelbare Adressierung verwendet, kann der erste Operand ein Register oder ein Speicherort sein und der zweite Operand ist ein unmittelbarer Konstant. Der erste Operand definiert die Länge der Daten.
+Beispiel:
+```
+BYTE_VALUE DB 150; Ein Bytewert wird definiert 
+WORD_VALUE DW 300; Ein Word-Wert wird definiert 
+ADD BYTE_VALUE, 65; Ein unmittelbarer Operand 65 wird hinzugefügt 
+MOV AX, 45H; Unmittelbare Konstante 45H wird in AX übertragen.
+```
 
 
+## Direct Memory Addressing
+In dieser Art der Adressierung wird direkter Zugriff auf den Hauptspeicher, normalerweise auf den Datensegment, benötigt. Diese Art der Adressierung führt zu langsamerem Verarbeiten von Daten. Um den genauen Speicherort der Daten zu finden, benötigen wir die Startadresse des Segments, die normalerweise im DS-Register gefunden wird, und einen Versatzwert. Dieser Versatzwert wird auch als effektive Adresse bezeichnet.
+
+In der direkten Adressierungsart wird der Versatzwert direkt als Teil des Befehls angegeben, normalerweise durch den Variablennamen gekennzeichnet. Der Assembler berechnet den Versatzwert und führt eine Symbol-Tabelle, die die Versatzwerte aller im Programm verwendeten Variablen speichert.
+
+In der direkten Speicheradressierung bezieht sich einer der Operanden auf einen Speicherort und der andere Operand auf ein Register.
+Beispiel:
+```
+ADD BYTE_VALUE, DL ; Fügt das Register im Speicherort hinzu 
+MOV BX, WORD_VALUE ; Operand aus dem Speicher wird dem Register hinzugefügt
+```
+
+## Direct-Offset Addressing
+Diese Adressierungsart nutzt arithmetische Operatoren, um eine Adresse zu verändern. Beispielsweise sehen Sie die folgenden Definitionen, die Tabellen von Daten definieren:
+
+BYTE_TABLE DB 14, 15, 22, 45 ; Tabellen von Bytes WORD_TABLE DW 134, 345, 564, 123 ; Tabellen von Worten Die folgenden Operationen greifen auf Daten aus den Tabellen im Speicher in Register zu:
+```
+MOV CL, BYTE_TABLE[2] ; Holt das 3. Element der BYTE_TABLE MOV CL, BYTE_TABLE + 2 ; Holt das 3. Element der BYTE_TABLE MOV CX, WORD_TABLE[3] ; Holt das 4. Element der WORD_TABLE MOV CX, WORD_TABLE + 3 ; Holt das 4. Element der WORD_TABLE
+```
+
+## Indirect Memory Addressing
+Auf Deutsch heißt die Indirekte Speicheradressierung Nutzung der Segment:Offset-Adressierung des Computers. In der Regel werden dafür die Basis-Register EBX, EBP (oder BX, BP) und die Index-Register (DI, SI) verwendet, die innerhalb von eckigen Klammern für Speicherreferenzen angegeben werden.
+
+Die indirekte Adressierung wird in der Regel für Variablen verwendet, die mehrere Elemente enthalten, wie zum Beispiel Arrays. Die Startadresse des Arrays wird z.B. im EBX-Register gespeichert.
+
+Der folgende Code-Schnipsel zeigt, wie man auf verschiedene Elemente der Variablen zugreift.
+```
+MY_TABLE TIMES 10 DW 0 ; Allociert 10 Worte (2 Bytes) die alle mit 0 initialisiert sind 
+MOV EBX, [MY_TABLE] ; Effektive Adresse von MY_TABLE in EBX 
+MOV [EBX], 110 ; MY_TABLE[0] = 110 
+ADD EBX, 2 ; EBX = EBX +2 
+MOV [EBX], 123 ; MY_TABLE[1] = 123
+```
+
+## The MOV Instruction
+Der Befehl MOV wird verwendet, um Daten von einem Speicherort zu einem anderen zu verschieben. Der Befehl MOV hat zwei Operanden. Die Syntax des MOV-Befehls ist: MOV destination, source. Der Befehl MOV kann in einer von fünf Formen verwendet werden: MOV register, register, MOV register, immediate, MOV memory, immediate, MOV register, memory, MOV memory, register. Bitte beachten Sie, dass beide Operanden im MOV-Vorgang gleich groß sein sollten und der Wert des Quelloperandens unverändert bleibt. Der Befehl MOV verursacht manchmal Ambiguitäten. In solchen Fällen ist es ratsam, einen Typ-Spezifikator zu verwenden.
+
+![image](https://user-images.githubusercontent.com/48016716/212989286-456564d5-ceca-47a5-8fd3-941a1c9d3bee.png)
 
 
 
